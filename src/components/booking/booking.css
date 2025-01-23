@@ -1,0 +1,88 @@
+.search-section {
+    background-color: #f4f4f4;
+    padding: 2rem;
+    text-align: center;
+    background: url(assests/bg.webp);
+    background-size: cover;
+}
+
+.search-section h1 {
+    margin-bottom: 1rem;
+}
+
+.search-section form {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.search-section form input,
+.search-section form button {
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+.results-section {
+    padding: 2rem;
+    background-color: #fff;
+
+}
+
+.train-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.book-button {
+    background-color: #003366;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.book-button:hover {
+    background-color: #002244;
+}
+
+.content {
+    flex: 1;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #003366;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+@media (max-width:600px) {
+    html,body{
+        height: 100%;
+        width: 100%;
+    }
+    #search-form{
+        display: inline;
+    }
+    #search-form input{
+        width: 100%;
+    }
+    #search-form button{
+        margin: 10px;
+        border-radius: 14px;
+        background-color: green;
+        color: white;
+        height: 50px;
+        width: 140px;
+    }
+}
