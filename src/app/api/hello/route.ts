@@ -71,7 +71,10 @@ export async function POST(request: NextRequest) {
     transaction.feePayer = sender;
 
     // Serialize and encode the transaction
-    const serializedTransaction = transaction.serialize();
+    const serializedTransaction = transaction.serialize({
+      verifySignatures:false,
+      requireAllSignatures:false
+    });
     const base64Transaction = Buffer.from(serializedTransaction).toString("base64");
 
     const message = "Thank you for your purchase of ExiledApe #518";
