@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     // Create a transaction and add the instruction
     const transaction = new Transaction();
-    transaction.add(ix); 
+    transaction.add(ix);
 
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     transaction.sign(merchant);
     const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
-
+    console.log("sig:",sig);
     // Serialize and encode the transaction
     const serializedTransaction = transaction.serialize({
       verifySignatures:false,
