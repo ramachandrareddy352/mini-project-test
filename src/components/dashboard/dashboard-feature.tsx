@@ -6,7 +6,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { ConfirmedSignatureInfo, Keypair, PublicKey, TransactionSignature } from '@solana/web3.js';
 import BigNumber from 'bignumber.js';
 import { simulateCheckout } from './simulateCheckout';
-import { validateTransfer } from './validate';
+import { validateTransfer } from './validateTransfer';
 
 const recipient = new PublicKey("MaXxmYACjL48QdM2hSHcYpQvqaRQtfEnu9EZfq4dVuo");
 
@@ -37,49 +37,48 @@ export default function DashboardFeature() {
 
     // console.log('\n5. Find the transaction');
 
-    // const signatureInfo = await new Promise<ConfirmedSignatureInfo>((resolve, reject) => {
-    //   const interval = setInterval(async () => {
-    //     console.count('Checking for transaction...');
-    //     try {
-    //       const result = await findReference(connection, reference, { finality: 'confirmed' });
-    //       console.log(result);
-    //       console.log('\n 🖌  Signature found: ', result.signature);
-    //       clearInterval(interval);
-    //       resolve(result);
-    //     } catch (error: any) {
-    //       if (!(error instanceof FindReferenceError)) {
-    //         // console.error(error);
-    //         clearInterval(interval);
-    //         reject(error);
-    //       }
-    //     }
-    //   }, 2000);
-    //    // Add a timeout of 5 minutes
-    //   // const timeout = setTimeout(() => {
-    //   //   clearInterval(interval);
-    //   //   console.log('❌ Payment timeout reached.');
-    //   //   setPaymentStatus("Timeout Reached");
-    //   //   reject(new Error('Payment timeout reached'));
-    //   // }, 2 * 60 * 1000); // 5 minutes in milliseconds
-    // });
-    // const { signature } = signatureInfo;
-    // setPaymentStatus("Confirmed");
+    const signatureInfo = await new Promise<ConfirmedSignatureInfo>((resolve, reject) => {
+      const interval = setInterval(async () => {
+        console.count('Checking for transaction...');
+        try {
+          const result = await findReference(connection, reference, { finality: 'confirmed' });
+          console.log(result);
+          console.log('\n 🖌  Signature found: ', result.signature);
+          clearInterval(interval);
+          resolve(result);
+        } catch (error: any) {
+          if (!(error instanceof FindReferenceError)) {
+            // console.error(error);
+            clearInterval(interval);
+            reject(error);
+          }
+        }
+      }, 2000);
+      //  Add a timeout of 5 minutes
+      // const timeout = setTimeout(() => {
+      //   clearInterval(interval);
+      //   console.log('❌ Payment timeout reached.');
+      //   setPaymentStatus("Timeout Reached");
+      //   reject(new Error('Payment timeout reached'));
+      // }, 2 * 60 * 1000); // 5 minutes in milliseconds
+    });
+    const { signature } = signatureInfo;
+    setPaymentStatus("Confirmed");
 
-    // console.log('\n6. 🔗 Validate transaction \n');
+    console.log('\n6. 🔗 Validate transaction \n');
 
-    // try {
-    //   await validateTransfer(connection, signature, { recipient: recipient, amount });
-
-    //   // Update payment status
-    //   setPaymentStatus('validated');
-    //   console.log('✅ Payment validated');
-    //   console.log('📦 Ship order to customer');
-    // } catch (error) {
-    //   // console.error(error.message);
-    //   setPaymentStatus('Failed to Pay');
-    // } finally {
-    //   setShowQR(false);
-    // }
+    try {
+      await validateTransfer(connection, signature, { recipient: recipient, amount });
+      // Update payment status
+      setPaymentStatus('validated');
+      console.log('✅ Payment validated');
+      console.log('📦 Ship order to customer');
+    } catch (error) {
+      // console.error(error.message);
+      setPaymentStatus('Failed to Pay');
+    } finally {
+      setShowQR(false);
+    }
   }
 
   return (

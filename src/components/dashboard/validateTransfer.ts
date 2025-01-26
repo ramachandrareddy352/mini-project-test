@@ -16,7 +16,7 @@ import type {
 import { LAMPORTS_PER_SOL, SystemInstruction, Transaction } from '@solana/web3.js';
 import BigNumber from 'bignumber.js';
 import { MEMO_PROGRAM_ID } from './constant';
-import type { Amount, Memo, Recipient, Reference, References, SPLToken } from './type';
+import type { Amount, Memo, Recipient, Reference, References, SPLToken } from './types';
 
 /**
  * Thrown when a transaction doesn't contain a valid Solana Pay transfer.
