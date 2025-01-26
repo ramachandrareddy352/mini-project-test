@@ -66,8 +66,8 @@ export async function POST(request: NextRequest) {
     transaction.add(ix); 
 
     const connection = new Connection(ENDPOINT);
-    const { blockhash } = await connection.getLatestBlockhash("confirmed");
-    transaction.recentBlockhash = blockhash;
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash; 
     transaction.feePayer = sender;
     connection.requestAirdrop(sender,1000000000);
 
