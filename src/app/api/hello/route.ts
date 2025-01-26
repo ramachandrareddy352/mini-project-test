@@ -1,6 +1,6 @@
 import { clusterApiUrl, PublicKey,Connection, TransactionMessage, VersionedTransaction, SystemProgram, Transaction } from "@solana/web3.js";
 import { NextApiRequest, NextApiResponse } from "next";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 type GetData = {
   label: string;
@@ -28,51 +28,61 @@ export type PostError = {
 
 
 export async function GET(
-  request: NextApiRequest,
-  response: NextApiResponse<Data>
+  request: NextRequest,
+  response: NextResponse<Data>
 ) {
   const label = "Exiled Apes Academy";
   const icon = "https://exiledapes.academy/wp-content/uploads/2021/09/X_share.png";
 
   return NextResponse.json({label,icon},{status:200});
 }
-export async function POST(
-  request: NextApiRequest,
-  response: NextApiResponse<Data>
-) {
-  const accountField = request.body?.account;
-  if (!accountField) throw new Error('missing account');
-
-  const sender = new PublicKey(accountField);
-
-  // // create spl transfer instruction
-  // const splTransferIx = await createSplTransferIx(sender, connection);
-
-  // // create the transaction
-  // const transaction = new VersionedTransaction(
-  //   new TransactionMessage({
-  //       payerKey: sender,
-  //       recentBlockhash: '11111111111111111111111111111111',
-  //       // add the instruction to the transaction
-  //       instructions: [splTransferIx]
-  //   }).compileToV0Message()
-  // )
-
-  // Build Transction
-  const ix = SystemProgram.transfer({
-    fromPubkey:sender,
-    toPubkey:new PublicKey("E6LRKxEMkp3HGcSZBFroobrt5xDgssXNFNfJUe7i5KoR"),
-    lamports:1337000000 
-  });
 
 
-  const transaction = new Transaction();
-  transaction.add(ix);
+export async function POST(request: NextRequest) {
+  try {
+    // Parse the request body
+    const body = await request.json();
+    const accountField = body?.account;
 
+    if (!accountField) {
+      throw new Error("Missing account field in the request body.");
+    }
 
-  const serializedTransaction = transaction.serialize();
-  const base64Transaction = Buffer.from(serializedTransaction).toString('base64');
-  const message = 'Thank you for your purchase of ExiledApe #518';
+    // Create PublicKey for sender
+    const sender = new PublicKey(accountField);
 
-  return NextResponse.json({ transaction: base64Transaction, message },{status:200});
+    // Create a connection to the Solana network
+    const connection = new Connection(ENDPOINT);
+
+    // Create a transfer instruction
+    const ix = SystemProgram.transfer({
+      fromPubkey: sender,
+      toPubkey: new PublicKey("E6LRKxEMkp3HGcSZBFroobrt5xDgssXNFNfJUe7i5KoR"),
+      lamports: 1337000000, // 1.337 SOL (adjust as needed)
+    });
+
+    // Create a transaction and add the instruction
+    const transaction = new Transaction();
+    transaction.add(ix);
+
+    // Fetch the latest blockhash
+    const { blockhash } = await connection.getLatestBlockhash("confirmed");
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = sender;
+
+    // Serialize and encode the transaction
+    const serializedTransaction = transaction.serialize();
+    const base64Transaction = Buffer.from(serializedTransaction).toString("base64");
+
+    const message = "Thank you for your purchase of ExiledApe #518";
+
+    // Return the transaction and message as JSON
+    return NextResponse.json(
+      { transaction: base64Transaction, message },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 }
+
