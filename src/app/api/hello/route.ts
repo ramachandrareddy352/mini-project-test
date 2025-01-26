@@ -1,7 +1,7 @@
-import { clusterApiUrl, PublicKey,Connection, TransactionMessage, VersionedTransaction, SystemProgram, Transaction } from "@solana/web3.js";
+import { clusterApiUrl, PublicKey,Connection, TransactionMessage, VersionedTransaction, SystemProgram, Transaction, Keypair } from "@solana/web3.js";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
-
+import bs58 from 'bs58'
 type GetData = {
   label: string;
   icon: string;
@@ -51,7 +51,9 @@ export async function POST(request: NextRequest) {
 
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
-
+    const privateKeyString: string = process.env.PRIVATE_KEY!;
+    const privateKey = JSON.parse(privateKeyString);
+    const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
     
 
     // Create a transfer instruction
@@ -68,9 +70,11 @@ export async function POST(request: NextRequest) {
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash; 
-    transaction.feePayer = sender;
+    transaction.feePayer = merchant.publicKey;
     connection.requestAirdrop(sender,1000000000);
 
+    transaction.sign(merchant);
+    const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
 
     // Serialize and encode the transaction
     const serializedTransaction = transaction.serialize({
@@ -82,7 +86,7 @@ export async function POST(request: NextRequest) {
     const message = "Thank you for your purchase of ExiledApe #518";
 
     return NextResponse.json(
-      { transaction: base64Transaction, message },
+      { transaction: base64Transaction, message,signature: sig},
       { status: 200 }
     );
   } catch (error: any) {
