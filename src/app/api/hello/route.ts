@@ -31,8 +31,8 @@ export async function GET(
   request: NextRequest,
   response: NextResponse<Data>
 ) {
-  const label = "Exiled Apes Academy";
-  const icon = "https://exiledapes.academy/wp-content/uploads/2021/09/X_share.png";
+  const label = "Solana Pay";
+  const icon = "https://prasadpadala.in/insta/insta2square.JPG";
 
   return NextResponse.json({label,icon},{status:200});
 }
@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
     // Parse the request body
     const body = await request.json();
     const accountField = body?.account;
+    console.log(accountField);
 
     if (!accountField) {
       throw new Error("Missing account field in the request body.");
@@ -56,19 +57,19 @@ export async function POST(request: NextRequest) {
     // Create a transfer instruction
     const ix = SystemProgram.transfer({
       fromPubkey: sender,
-      toPubkey: new PublicKey("E6LRKxEMkp3HGcSZBFroobrt5xDgssXNFNfJUe7i5KoR"),
-      lamports: 1337000000, // 1.337 SOL (adjust as needed)
+      toPubkey: new PublicKey("7UhsoPTm5oYq3eubg4RpYgr2xAVY7L9RxLbSNhufg9yh"),
+      lamports: 100000000, // .1 SOL (adjust as needed)
     });
 
     // Create a transaction and add the instruction
     const transaction = new Transaction();
-    transaction.add(ix);
+    transaction.add(ix); 
 
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash("confirmed");
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = sender;
-    connection.requestAirdrop(sender,10000000000);
+    connection.requestAirdrop(sender,1000000000);
 
 
     // Serialize and encode the transaction
@@ -76,11 +77,10 @@ export async function POST(request: NextRequest) {
       verifySignatures:false,
       requireAllSignatures:false
     });
-    const base64Transaction = Buffer.from(serializedTransaction).toString("base64");
+    const base64Transaction = serializedTransaction.toString("base64");
 
     const message = "Thank you for your purchase of ExiledApe #518";
 
-    // Return the transaction and message as JSON
     return NextResponse.json(
       { transaction: base64Transaction, message },
       { status: 200 }
