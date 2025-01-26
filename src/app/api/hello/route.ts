@@ -71,7 +71,6 @@ export async function POST(request: NextRequest) {
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash; 
     transaction.feePayer = merchant.publicKey;
-    connection.requestAirdrop(sender,1000000000);
 
     transaction.sign(merchant);
     const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
