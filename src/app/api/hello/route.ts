@@ -51,8 +51,7 @@ export async function POST(request: NextRequest) {
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
 
-    // Create a connection to the Solana network
-    const connection = new Connection(ENDPOINT);
+    
 
     // Create a transfer instruction
     const ix = SystemProgram.transfer({
@@ -65,10 +64,12 @@ export async function POST(request: NextRequest) {
     const transaction = new Transaction();
     transaction.add(ix);
 
-    // Fetch the latest blockhash
+    const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash("confirmed");
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = sender;
+    connection.requestAirdrop(sender,10000000000);
+
 
     // Serialize and encode the transaction
     const serializedTransaction = transaction.serialize({
