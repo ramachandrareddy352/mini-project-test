@@ -122,6 +122,7 @@ export async function POST(request: NextRequest) {
       programId: PROGRAM_ID, // Your program's ID
       keys: [
         { pubkey: sender, isSigner: true, isWritable: true }, // Account to increment
+        { pubkey: new PublicKey("AProxg6kTWNFPAWjr93L1LwzSi4chMaBdnyFVZhStEx3"), isSigner: false, isWritable: true },
       ],
       data: Buffer.from([INCREMENT_METHOD_ID]), // Instruction ID for the increment method
     });
