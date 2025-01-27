@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { simulateCheckout } from './simulateCheckout';
 import { validateTransfer } from './validateTransfer';
 
-const MERCHANT_WALLET = new PublicKey("MaXxmYACjL48QdM2hSHcYpQvqaRQtfEnu9EZfq4dVuo");
+const MERCHANT_WALLET = new PublicKey("7UhsoPTm5oYq3eubg4RpYgr2xAVY7L9RxLbSNhufg9yh");
 
 
 export default function DashboardFeature() {
@@ -23,7 +23,7 @@ export default function DashboardFeature() {
     setShowQR(true);
     console.log('\n2. 🛍 Simulate a customer checkout \n');
     const { label, message, memo, amount, reference } = await simulateCheckout();
-    const splToken = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
+    const splToken = new PublicKey('Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr');
 
     // console.log('3. 💰 Create a payment request link for native sol \n');
     // const url = encodeURL({ recipient: recipient, amount, reference, label, message, memo });
@@ -79,16 +79,16 @@ export default function DashboardFeature() {
     console.log('\n6. 🔗 Validate transaction \n');
 
     try {
-      await validateTransfer(connection, signature, { recipient: MERCHANT_WALLET, amount });
+      await validateTransfer(connection, signature, { recipient: MERCHANT_WALLET, amount,splToken });
       // Update payment status
       setPaymentStatus('validated');
       console.log('✅ Payment validated');
       console.log('📦 Ship order to customer');
     } catch (error) {
-      // console.error(error.message);
+      console.log(error);
       setPaymentStatus('Failed to Pay');
     } finally {
-      setShowQR(false);
+      // setShowQR(false);
     }
   }
 

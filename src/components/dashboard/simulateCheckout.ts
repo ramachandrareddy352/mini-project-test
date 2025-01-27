@@ -23,7 +23,7 @@ export async function simulateCheckout(): Promise<{
         label: 'Jungle Cats store',
         message: 'Jungle Cats store - your order - #001234',
         memo: 'JC#4098',
-        amount: new BigNumber(0.01),
+        amount: new BigNumber(100),
         reference: new Keypair().publicKey,
     };
 }
