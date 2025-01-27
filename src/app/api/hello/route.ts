@@ -44,70 +44,12 @@ export async function GET(
 }
 
 
-// export async function POST(request: NextRequest) {
-//   try {
-//     // Parse the request body
-//     const body = await request.json();
-//     const accountField = body?.account;
-//     console.log(accountField);
-
-//     if (!accountField) {
-//       throw new Error("Missing account field in the request body.");
-//     }
-
-//     // Create PublicKey for sender
-//     const sender = new PublicKey(accountField);
-//     const privateKeyString: string = process.env.PRIVATE_KEY!;
-//     const privateKey = JSON.parse(privateKeyString);
-//     const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
-    
-
-//     // Generate a unique reference key for the transaction
-//     const reference = new Keypair().publicKey;
-
-//     // Create a transfer instruction
-//     const ix = SystemProgram.transfer({
-//       fromPubkey: sender,
-//       toPubkey: new PublicKey("7UhsoPTm5oYq3eubg4RpYgr2xAVY7L9RxLbSNhufg9yh"),
-//       lamports: 100000000, // .1 SOL (adjust as needed)
-//     });
-
-//     // Create a transaction and add the instruction
-//     let transaction = new Transaction();
-//     transaction.add(ix);
-
-//     const connection = new Connection(ENDPOINT);
-//     const { blockhash } = await connection.getLatestBlockhash();
-//     transaction.recentBlockhash = blockhash; 
-//     transaction.feePayer = merchant.publicKey;
-
-//     transaction = Transaction.from(transaction.serialize());
-//     transaction.sign(merchant);
-//     const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
-//     console.log("sig:",sig);
-//     // Serialize and encode the transaction
-//     const serializedTransaction = transaction.serialize({
-//       verifySignatures:false,
-//       requireAllSignatures:false
-//     });
-//     const base64Transaction = serializedTransaction.toString("base64");
-
-//     const message = "Thank you for your purchase of ExiledApe #518";
-
-//     return NextResponse.json(
-//       { transaction: base64Transaction, message,reference: reference.toBase58() },
-//       { status: 200 }
-//     );
-//   } catch (error: any) {
-//     return NextResponse.json({ error: error.message }, { status: 400 });
-//   }
-// }
-
 export async function POST(request: NextRequest) {
   try {
     // Parse the request body
     const body = await request.json();
     const accountField = body?.account;
+    console.log(accountField);
 
     if (!accountField) {
       throw new Error("Missing account field in the request body.");
@@ -115,49 +57,107 @@ export async function POST(request: NextRequest) {
 
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
-    // console.log(sender);
-    // Load merchant private key
+    const privateKeyString: string = process.env.PRIVATE_KEY!;
+    const privateKey = JSON.parse(privateKeyString);
+    const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
     
 
-    // Create the increment instruction
-    const incrementIx = new TransactionInstruction({
-      programId: PROGRAM_ID, // Your program's ID
-      keys: [
-        { pubkey: new PublicKey("HHZyF9QPGtaBAniTTnjWJN8vsyXhe4qvSrFYKiwsK5PA"), isSigner: false, isWritable: true },
-        { pubkey: sender, isSigner: true, isWritable: true }, 
-      ],
-      data: data, 
+    // Generate a unique reference key for the transaction
+    const reference = new Keypair().publicKey;
+
+    // Create a transfer instruction
+    const ix = SystemProgram.transfer({
+      fromPubkey: sender,
+      toPubkey: new PublicKey("7UhsoPTm5oYq3eubg4RpYgr2xAVY7L9RxLbSNhufg9yh"),
+      lamports: 100000000, // .1 SOL (adjust as needed)
     });
 
-    // Create the transaction
-    let transaction = new Transaction().add(incrementIx);
+    // Create a transaction and add the instruction
+    let transaction = new Transaction();
+    transaction.add(ix);
 
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
-    transaction.feePayer = sender;
+    transaction.recentBlockhash = blockhash; 
+    transaction.feePayer = merchant.publicKey;
 
-    // transaction.partialSign(merchant)
-
-    // transaction = Transaction.from(transaction.serialize({
-    //   verifySignatures:false,
-    //   requireAllSignatures:false
-    // }))
-
+    transaction = Transaction.from(transaction.serialize());
+    transaction.sign(merchant);
+    const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
+    console.log("sig:",sig);
+    // Serialize and encode the transaction
     const serializedTransaction = transaction.serialize({
       verifySignatures:false,
       requireAllSignatures:false
     });
     const base64Transaction = serializedTransaction.toString("base64");
-    console.log(base64Transaction);
-    // Send the transaction
-  
+
+    const message = "Thank you for your purchase of ExiledApe #518";
 
     return NextResponse.json(
-      { transaction: base64Transaction,message: "Transaction sent successfully"},
+      { transaction: base64Transaction, message,reference: reference.toBase58() },
       { status: 200 }
     );
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }
+
+// export async function POST(request: NextRequest) {
+//   try {
+//     // Parse the request body
+//     const body = await request.json();
+//     const accountField = body?.account;
+
+//     if (!accountField) {
+//       throw new Error("Missing account field in the request body.");
+//     }
+
+//     // Create PublicKey for sender
+//     const sender = new PublicKey(accountField);
+//     // console.log(sender);
+//     // Load merchant private key
+    
+
+//     // Create the increment instruction
+//     const incrementIx = new TransactionInstruction({
+//       programId: PROGRAM_ID, // Your program's ID
+//       keys: [
+//         { pubkey: new PublicKey("HHZyF9QPGtaBAniTTnjWJN8vsyXhe4qvSrFYKiwsK5PA"), isSigner: false, isWritable: true },
+//         { pubkey: sender, isSigner: true, isWritable: true }, 
+//       ],
+//       data: data, 
+//     });
+
+//     // Create the transaction
+//     let transaction = new Transaction().add(incrementIx);
+
+//     const connection = new Connection(ENDPOINT);
+//     const { blockhash } = await connection.getLatestBlockhash();
+//     transaction.recentBlockhash = blockhash;
+//     transaction.feePayer = sender;
+
+//     // transaction.partialSign(merchant)
+
+//     // transaction = Transaction.from(transaction.serialize({
+//     //   verifySignatures:false,
+//     //   requireAllSignatures:false
+//     // }))
+
+//     const serializedTransaction = transaction.serialize({
+//       verifySignatures:false,
+//       requireAllSignatures:false
+//     });
+//     const base64Transaction = serializedTransaction.toString("base64");
+//     console.log(base64Transaction);
+//     // Send the transaction
+  
+
+//     return NextResponse.json(
+//       { transaction: base64Transaction,message: "Transaction sent successfully"},
+//       { status: 200 }
+//     );
+//   } catch (error: any) {
+//     return NextResponse.json({ error: error.message }, { status: 400 });
+//   }
+// }
