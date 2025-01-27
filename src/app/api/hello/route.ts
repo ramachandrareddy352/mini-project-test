@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
-    transaction.feePayer = sender;
+    transaction.feePayer = merchant.publicKey;
 
     transaction.sign(merchant);
     const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
