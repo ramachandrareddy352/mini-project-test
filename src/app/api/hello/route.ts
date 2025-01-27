@@ -29,7 +29,9 @@ export type PostError = {
 const PROGRAM_ID = new PublicKey("AAwQy1UeenPqH6poqtiR6sKePDgeF2YcnHmy2jSNYRL6");
 const DISCRIMINATOR = sha256.digest('global:increment').slice(0,8);
 const data = Buffer.from([...DISCRIMINATOR])
-
+const privateKeyString: string = process.env.PRIVATE_KEY!;
+const privateKey = JSON.parse(privateKeyString);
+const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
 
 export async function GET(
   request: NextRequest,
@@ -113,11 +115,9 @@ export async function POST(request: NextRequest) {
 
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
-    console.log(sender);
+    // console.log(sender);
     // Load merchant private key
-    // const privateKeyString: string = process.env.PRIVATE_KEY!;
-    // const privateKey = JSON.parse(privateKeyString);
-    // const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
+    
 
     // Create the increment instruction
     const incrementIx = new TransactionInstruction({
@@ -130,18 +130,24 @@ export async function POST(request: NextRequest) {
     });
 
     // Create the transaction
-    const transaction = new Transaction().add(incrementIx);
+    let transaction = new Transaction().add(incrementIx);
 
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
-    transaction.feePayer = sender;
+    transaction.feePayer = merchant.publicKey;
 
-    // transaction.sign(merchant);
-    // const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
-    // console.log("sig:",sig);
+    transaction.partialSign(merchant)
 
-    const serializedTransaction = transaction.serialize();
+    transaction = Transaction.from(transaction.serialize({
+      verifySignatures:false,
+      requireAllSignatures:false
+    }))
+
+    const serializedTransaction = transaction.serialize({
+      verifySignatures:false,
+      requireAllSignatures:false
+    });
     const base64Transaction = serializedTransaction.toString("base64");
     console.log(base64Transaction);
     // Send the transaction
@@ -149,7 +155,7 @@ export async function POST(request: NextRequest) {
     // console.log("Transaction sent. Signature:", signature);
 
     return NextResponse.json(
-      { base64Transaction,message: "Transaction sent successfully"},
+      { transaction: base64Transaction,message: "Transaction sent successfully"},
       { status: 200 }
     );
   } catch (error: any) {
