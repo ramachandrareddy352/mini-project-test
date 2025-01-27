@@ -135,9 +135,9 @@ export async function POST(request: NextRequest) {
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
-    transaction.feePayer = merchant.publicKey;
+    transaction.feePayer = sender;
 
-    transaction.partialSign(merchant)
+    // transaction.partialSign(merchant)
 
     transaction = Transaction.from(transaction.serialize({
       verifySignatures:false,
