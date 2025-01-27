@@ -1,6 +1,7 @@
 import { clusterApiUrl, PublicKey,Connection, TransactionMessage, VersionedTransaction, SystemProgram, Transaction, Keypair, TransactionInstruction } from "@solana/web3.js";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
+import { sha256 } from "js-sha256";
 import bs58 from 'bs58'
 type GetData = {
   label: string;
@@ -25,8 +26,8 @@ export type PostError = {
 };
 
 const PROGRAM_ID = new PublicKey("AAwQy1UeenPqH6poqtiR6sKePDgeF2YcnHmy2jSNYRL6");
-const INCREMENT_METHOD_ID = 1;
-
+const DISCRIMINATOR = sha256.digest('global:increment').slice(0,8);
+const data = Buffer.from([...DISCRIMINATOR])
 
 
 export async function GET(
@@ -118,15 +119,13 @@ export async function POST(request: NextRequest) {
     // const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
 
     // Create the increment instruction
-    let instruction = Buffer.alloc(1);
-    instruction[0]=1;
     const incrementIx = new TransactionInstruction({
       programId: PROGRAM_ID, // Your program's ID
       keys: [
         { pubkey: new PublicKey("HHZyF9QPGtaBAniTTnjWJN8vsyXhe4qvSrFYKiwsK5PA"), isSigner: false, isWritable: true },
         { pubkey: sender, isSigner: true, isWritable: true }, 
       ],
-      data: instruction, // Instruction ID for the increment method
+      data: data, 
     });
 
     // Create the transaction
@@ -135,13 +134,16 @@ export async function POST(request: NextRequest) {
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
-    // transaction.feePayer = merchant.publicKey;
+    transaction.feePayer = sender;
 
     // transaction.sign(merchant);
     // const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
     // console.log("sig:",sig);
 
-    const serializedTransaction = transaction.serialize();
+    const serializedTransaction = transaction.serialize({
+      verifySignatures:false,
+      requireAllSignatures:false
+    });
     const base64Transaction = serializedTransaction.toString("base64");
     // Send the transaction
     // const signature = await connection.sendTransaction(transaction, [merchant]);
