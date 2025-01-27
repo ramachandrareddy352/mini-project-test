@@ -139,20 +139,16 @@ export async function POST(request: NextRequest) {
 
     // transaction.partialSign(merchant)
 
-    transaction = Transaction.from(transaction.serialize({
-      verifySignatures:false,
-      requireAllSignatures:false
-    }))
+    // transaction = Transaction.from(transaction.serialize({
+    //   verifySignatures:false,
+    //   requireAllSignatures:false
+    // }))
 
-    const serializedTransaction = transaction.serialize({
-      verifySignatures:false,
-      requireAllSignatures:false
-    });
+    const serializedTransaction = transaction.serialize();
     const base64Transaction = serializedTransaction.toString("base64");
     console.log(base64Transaction);
     // Send the transaction
-    // const signature = await connection.sendTransaction(transaction, [merchant]);
-    // console.log("Transaction sent. Signature:", signature);
+  
 
     return NextResponse.json(
       { transaction: base64Transaction,message: "Transaction sent successfully"},
