@@ -113,18 +113,20 @@ export async function POST(request: NextRequest) {
     const sender = new PublicKey(accountField);
 
     // Load merchant private key
-    const privateKeyString: string = process.env.PRIVATE_KEY!;
-    const privateKey = JSON.parse(privateKeyString);
-    const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
+    // const privateKeyString: string = process.env.PRIVATE_KEY!;
+    // const privateKey = JSON.parse(privateKeyString);
+    // const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
 
     // Create the increment instruction
+    let instruction = Buffer.alloc(1);
+    instruction[0]=1;
     const incrementIx = new TransactionInstruction({
       programId: PROGRAM_ID, // Your program's ID
       keys: [
-        { pubkey: sender, isSigner: true, isWritable: true }, // Account to increment
-        { pubkey: new PublicKey("AProxg6kTWNFPAWjr93L1LwzSi4chMaBdnyFVZhStEx3"), isSigner: false, isWritable: true },
+        { pubkey: new PublicKey("HHZyF9QPGtaBAniTTnjWJN8vsyXhe4qvSrFYKiwsK5PA"), isSigner: false, isWritable: true },
+        { pubkey: sender, isSigner: true, isWritable: true }, 
       ],
-      data: Buffer.from([INCREMENT_METHOD_ID]), // Instruction ID for the increment method
+      data: instruction, // Instruction ID for the increment method
     });
 
     // Create the transaction
@@ -133,16 +135,16 @@ export async function POST(request: NextRequest) {
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
-    transaction.feePayer = merchant.publicKey;
+    // transaction.feePayer = merchant.publicKey;
 
-    transaction.sign(merchant);
-    const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
-    console.log("sig:",sig);
+    // transaction.sign(merchant);
+    // const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
+    // console.log("sig:",sig);
 
     const serializedTransaction = transaction.serialize();
     const base64Transaction = serializedTransaction.toString("base64");
     // Send the transaction
-    // const signature = await connection.(transaction, [merchant]);
+    // const signature = await connection.sendTransaction(transaction, [merchant]);
     // console.log("Transaction sent. Signature:", signature);
 
     return NextResponse.json(
