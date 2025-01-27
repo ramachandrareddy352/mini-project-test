@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 import { sha256 } from "js-sha256";
 import bs58 from 'bs58'
+import { send } from "process";
 type GetData = {
   label: string;
   icon: string;
@@ -112,11 +113,11 @@ export async function POST(request: NextRequest) {
 
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
-
+    console.log(sender);
     // Load merchant private key
-    const privateKeyString: string = process.env.PRIVATE_KEY!;
-    const privateKey = JSON.parse(privateKeyString);
-    const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
+    // const privateKeyString: string = process.env.PRIVATE_KEY!;
+    // const privateKey = JSON.parse(privateKeyString);
+    // const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
 
     // Create the increment instruction
     const incrementIx = new TransactionInstruction({
@@ -134,17 +135,15 @@ export async function POST(request: NextRequest) {
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
-    transaction.feePayer = merchant.publicKey;
+    transaction.feePayer = sender;
 
-    transaction.sign(merchant);
-    const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
-    console.log("sig:",sig);
+    // transaction.sign(merchant);
+    // const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
+    // console.log("sig:",sig);
 
-    const serializedTransaction = transaction.serialize({
-      verifySignatures:false,
-      requireAllSignatures:false
-    });
+    const serializedTransaction = transaction.serialize();
     const base64Transaction = serializedTransaction.toString("base64");
+    console.log(base64Transaction);
     // Send the transaction
     // const signature = await connection.sendTransaction(transaction, [merchant]);
     // console.log("Transaction sent. Signature:", signature);
