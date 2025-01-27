@@ -114,9 +114,9 @@ export async function POST(request: NextRequest) {
     const sender = new PublicKey(accountField);
 
     // Load merchant private key
-    // const privateKeyString: string = process.env.PRIVATE_KEY!;
-    // const privateKey = JSON.parse(privateKeyString);
-    // const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
+    const privateKeyString: string = process.env.PRIVATE_KEY!;
+    const privateKey = JSON.parse(privateKeyString);
+    const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
 
     // Create the increment instruction
     const incrementIx = new TransactionInstruction({
@@ -136,9 +136,9 @@ export async function POST(request: NextRequest) {
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = sender;
 
-    // transaction.sign(merchant);
-    // const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
-    // console.log("sig:",sig);
+    transaction.sign(merchant);
+    const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
+    console.log("sig:",sig);
 
     const serializedTransaction = transaction.serialize({
       verifySignatures:false,
