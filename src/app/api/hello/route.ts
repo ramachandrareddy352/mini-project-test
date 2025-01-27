@@ -57,13 +57,11 @@ export async function POST(request: NextRequest) {
 
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
-    const privateKeyString: string = process.env.PRIVATE_KEY!;
-    const privateKey = JSON.parse(privateKeyString);
-    const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
+
     
 
     // Generate a unique reference key for the transaction
-    const reference = new Keypair().publicKey;
+    // const reference = new Keypair().publicKey;
 
     // Create a transfer instruction
     const ix = SystemProgram.transfer({
@@ -79,12 +77,12 @@ export async function POST(request: NextRequest) {
     const connection = new Connection(ENDPOINT);
     const { blockhash } = await connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash; 
-    transaction.feePayer = merchant.publicKey;
+    transaction.feePayer = sender;
 
-    transaction = Transaction.from(transaction.serialize());
-    transaction.sign(merchant);
-    const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
-    console.log("sig:",sig);
+    // transaction = Transaction.from(transaction.serialize());
+    // transaction.sign(merchant);
+    // const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
+    // console.log("sig:",sig);
     // Serialize and encode the transaction
     const serializedTransaction = transaction.serialize({
       verifySignatures:false,
@@ -95,7 +93,7 @@ export async function POST(request: NextRequest) {
     const message = "Thank you for your purchase of ExiledApe #518";
 
     return NextResponse.json(
-      { transaction: base64Transaction, message,reference: reference.toBase58() },
+      { transaction: base64Transaction, message },
       { status: 200 }
     );
   } catch (error: any) {
