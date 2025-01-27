@@ -138,10 +138,7 @@ export async function POST(request: NextRequest) {
     const sig = transaction.signature ? bs58.encode(transaction.signature) : '';
     console.log("sig:",sig);
 
-    const serializedTransaction = transaction.serialize({
-            verifySignatures:false,
-            requireAllSignatures:false
-          });
+    const serializedTransaction = transaction.serialize();
     const base64Transaction = serializedTransaction.toString("base64");
     // Send the transaction
     // const signature = await connection.(transaction, [merchant]);

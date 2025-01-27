@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { simulateCheckout } from './simulateCheckout';
 import { validateTransfer } from './validateTransfer';
 
-const recipient = new PublicKey("MaXxmYACjL48QdM2hSHcYpQvqaRQtfEnu9EZfq4dVuo");
+const MERCHANT_WALLET = new PublicKey("MaXxmYACjL48QdM2hSHcYpQvqaRQtfEnu9EZfq4dVuo");
 
 
 export default function DashboardFeature() {
@@ -23,12 +23,23 @@ export default function DashboardFeature() {
     setShowQR(true);
     console.log('\n2. 🛍 Simulate a customer checkout \n');
     const { label, message, memo, amount, reference } = await simulateCheckout();
-    // const reference = new Keypair().publicKey;
-    // const url = encodeURL({ recipient, amount, reference, label, message, memo });
-    console.log('3. 💰 Create a payment request link \n');
+    const splToken = new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v');
+
+    // console.log('3. 💰 Create a payment request link for native sol \n');
     // const url = encodeURL({ recipient: recipient, amount, reference, label, message, memo });
-    const SOLANA_PAY_URL = "solana:https://mini-project-e3-s2.vercel.app//api/hello"
-    const qr = createQR(SOLANA_PAY_URL, 360, 'white', 'black');
+    console.log('3. 💰 Create a payment request link for spl-token sol \n');
+    const url = encodeURL({
+      recipient:MERCHANT_WALLET,
+      amount,
+      splToken,
+      reference,
+      label,
+      message,
+      memo,
+  });
+  // this is for creating tranction and working through api's
+    // const SOLANA_PAY_URL = "solana:https://mini-project-e3-s2.vercel.app//api/hello"
+    const qr = createQR(url, 360, 'white', 'black');
     if (qrRef.current) {
       qrRef.current.innerHTML = ''
       qr.append(qrRef.current)
@@ -55,12 +66,12 @@ export default function DashboardFeature() {
         }
       }, 2000);
       //  Add a timeout of 5 minutes
-      // const timeout = setTimeout(() => {
-      //   clearInterval(interval);
-      //   console.log('❌ Payment timeout reached.');
-      //   setPaymentStatus("Timeout Reached");
-      //   reject(new Error('Payment timeout reached'));
-      // }, 2 * 60 * 1000); // 5 minutes in milliseconds
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        console.log('❌ Payment timeout reached.');
+        setPaymentStatus("Timeout Reached");
+        reject(new Error('Payment timeout reached'));
+      }, 2 * 60 * 1000); // 5 minutes in milliseconds
     });
     const { signature } = signatureInfo;
     setPaymentStatus("Confirmed");
@@ -68,7 +79,7 @@ export default function DashboardFeature() {
     console.log('\n6. 🔗 Validate transaction \n');
 
     try {
-      await validateTransfer(connection, signature, { recipient: recipient, amount });
+      await validateTransfer(connection, signature, { recipient: MERCHANT_WALLET, amount });
       // Update payment status
       setPaymentStatus('validated');
       console.log('✅ Payment validated');
