@@ -28,18 +28,16 @@ export default function DashboardFeature() {
   const startPaymentTransfer = async () => {
     setShowQR(true);
     console.log("\n2. 🛍 Simulate a customer checkout \n");
-    const searchParams = new URLSearchParams([
-      ["reference", reference.toString()],
-    ]);
+    const params = new URLSearchParams();
+    params.append("reference", reference.toString());
 
-    // Create a new URL object using the current origin and the API URL with search parameters
-    const apiUrl = new URL(`/api/hello?${searchParams.toString()}`);
-
+    const apiUrl = `${location.protocol}//${
+      location.host
+    }/api/hello?${params.toString()}`;
     const urlFields: TransactionRequestURLFields = {
-      link: apiUrl,
+      link: new URL(apiUrl),
     };
     const url = encodeURL(urlFields);
-    console.log(url);
     const qr = createQR(url, 400, "transparent");
     console.log(qrRef.current);
     if (qrRef.current) {
