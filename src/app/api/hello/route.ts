@@ -111,8 +111,8 @@ export async function POST(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
+    console.log(new URL(request.url));
     const referenceParam = searchParams.get('reference');
-    console.log(referenceParam);
     if (!referenceParam) {
       throw new Error('Missing reference in the URL query parameters.');
     }
