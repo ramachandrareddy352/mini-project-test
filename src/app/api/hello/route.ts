@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = sender;
 
-    transaction.partialSign(merchant)
+    // transaction.partialSign(merchant)
 
     // transaction = Transaction.from(transaction.serialize({
     //   verifySignatures:false,
