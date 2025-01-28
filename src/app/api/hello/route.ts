@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
   
 
     return NextResponse.json(
-      { transaction: base64Transaction,message: "Transaction sent successfully",reference:reference.toBase58()},
+      { transaction: base64Transaction,message: "Transaction sent successfully"},
       { status: 200 }
     );
   } catch (error: any) {
