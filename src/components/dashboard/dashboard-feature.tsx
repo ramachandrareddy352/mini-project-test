@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createQR, encodeURL, findReference, FindReferenceError } from '@solana/pay';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { ConfirmedSignatureInfo, Keypair, PublicKey, TransactionSignature } from '@solana/web3.js';
+import { ConfirmedSignatureInfo, Keypair, PublicKey, SolanaJSONRPCError, TransactionSignature } from '@solana/web3.js';
 import BigNumber from 'bignumber.js';
 import { simulateCheckout } from './simulateCheckout';
 import { validateTransfer } from './validateTransfer';
@@ -39,6 +39,7 @@ export default function DashboardFeature() {
   });
   // this is for creating tranction and working through api's
     const SOLANA_PAY_URL = `solana:https://mini-project-e3-s2.vercel.app//api/hello?reference=${reference}`
+    console.log(SOLANA_PAY_URL);
     const qr = createQR(SOLANA_PAY_URL, 360, 'white', 'black');
     if (qrRef.current) {
       qrRef.current.innerHTML = ''
