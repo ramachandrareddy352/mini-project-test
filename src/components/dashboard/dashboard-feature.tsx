@@ -33,17 +33,15 @@ export default function DashboardFeature() {
     ]);
 
     // Create a new URL object using the current origin and the API URL with search parameters
-    const apiUrl = new URL(
-      `/api/hello?${searchParams.toString()}`,
-      location.origin
-    );
+    const apiUrl = new URL(`/api/hello?${searchParams.toString()}`);
 
     const urlFields: TransactionRequestURLFields = {
       link: apiUrl,
     };
     const url = encodeURL(urlFields);
     console.log(url);
-    const qr = createQR(url, 360, "white", "black");
+    const qr = createQR(url, 400, "transparent");
+    console.log(qrRef.current);
     if (qrRef.current) {
       qrRef.current.innerHTML = "";
       qr.append(qrRef.current);
@@ -65,6 +63,7 @@ export default function DashboardFeature() {
       setReference(Keypair.generate().publicKey);
       setPaymentStatus("confirmed");
       window.alert("Transaction Confirmed");
+      setShowQR(false);
     } catch (e) {
       // If current reference not found, ignore error
       if (e instanceof FindReferenceError) {
