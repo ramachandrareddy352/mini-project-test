@@ -110,14 +110,15 @@ export async function POST(request: NextRequest) {
       throw new Error("Missing account field in the request body.");
     }
 
-    const { searchParams } = new URL(request.url);
-    const referenceParam = searchParams.get('reference');
-    if (!referenceParam) {
-      throw new Error('Missing reference in the URL query parameters.');
-    }
+    // const { searchParams } = new URL(request.url);
+    // const referenceParam = searchParams.get('reference');
+    // if (!referenceParam) {
+    //   throw new Error('Missing reference in the URL query parameters.');
+    // }
+    // const reference = new PublicKey(referenceParam);
+    const reference = new Keypair().publicKey;
+    // console.log(reference.toBase58());
 
-    const reference = new PublicKey(referenceParam);
-    console.log(reference.toBase58());
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
     // console.log(sender);
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
       keys: [
         { pubkey: new PublicKey("HHZyF9QPGtaBAniTTnjWJN8vsyXhe4qvSrFYKiwsK5PA"), isSigner: false, isWritable: true },
         { pubkey: sender, isSigner: true, isWritable: true }, 
-        // { pubkey: reference, isSigner: false, isWritable: false },
+        { pubkey: reference, isSigner: false, isWritable: false },
       ],
       data: data, 
     });
