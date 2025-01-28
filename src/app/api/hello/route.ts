@@ -36,6 +36,7 @@ export async function GET(
   request: NextRequest,
   response: NextResponse<Data>
 ) {
+  console.log(new URL(request.url));
   const label = "Solana Pay";
   const icon = "https://prasadpadala.in/insta/insta2square.JPG";
 
