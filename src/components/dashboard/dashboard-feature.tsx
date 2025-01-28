@@ -38,7 +38,7 @@ export default function DashboardFeature() {
       memo,
   });
   // this is for creating tranction and working through api's
-    const SOLANA_PAY_URL = "solana:https://mini-project-e3-s2.vercel.app//api/hello"
+    const SOLANA_PAY_URL = `solana:https://mini-project-e3-s2.vercel.app//api/hello?reference=${reference}`
     const qr = createQR(SOLANA_PAY_URL, 360, 'white', 'black');
     if (qrRef.current) {
       qrRef.current.innerHTML = ''

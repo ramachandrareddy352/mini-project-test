@@ -32,7 +32,6 @@ const data = Buffer.from([...DISCRIMINATOR])
 const privateKeyString: string = process.env.PRIVATE_KEY!;
 const privateKey = JSON.parse(privateKeyString);
 const merchant = Keypair.fromSecretKey(new Uint8Array(privateKey));
-
 export async function GET(
   request: NextRequest,
   response: NextResponse<Data>
@@ -111,6 +110,14 @@ export async function POST(request: NextRequest) {
       throw new Error("Missing account field in the request body.");
     }
 
+    const { searchParams } = new URL(request.url);
+    const referenceParam = searchParams.get('reference');
+    if (!referenceParam) {
+      throw new Error('Missing reference in the URL query parameters.');
+    }
+
+    const reference = new PublicKey(referenceParam);
+
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
     // console.log(sender);
@@ -123,6 +130,7 @@ export async function POST(request: NextRequest) {
       keys: [
         { pubkey: new PublicKey("HHZyF9QPGtaBAniTTnjWJN8vsyXhe4qvSrFYKiwsK5PA"), isSigner: false, isWritable: true },
         { pubkey: sender, isSigner: true, isWritable: true }, 
+        { pubkey: reference, isSigner: false, isWritable: false },
       ],
       data: data, 
     });
@@ -135,7 +143,7 @@ export async function POST(request: NextRequest) {
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = sender;
 
-    // transaction.partialSign(merchant)
+    transaction.partialSign(merchant)
 
     // transaction = Transaction.from(transaction.serialize({
     //   verifySignatures:false,
@@ -152,7 +160,7 @@ export async function POST(request: NextRequest) {
   
 
     return NextResponse.json(
-      { transaction: base64Transaction,message: "Transaction sent successfully"},
+      { transaction: base64Transaction,message: "Transaction sent successfully",reference:reference.toBase58()},
       { status: 200 }
     );
   } catch (error: any) {
