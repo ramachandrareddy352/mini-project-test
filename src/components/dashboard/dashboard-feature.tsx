@@ -44,6 +44,7 @@ export default function DashboardFeature() {
       qrRef.current.innerHTML = ''
       qr.append(qrRef.current)
     }
+    console.log(reference);
     console.log(qr);
     console.log(qrRef);
     setPaymentStatus("Pending....")

@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     const reference = new PublicKey(referenceParam);
-
+    console.log(reference);
     // Create PublicKey for sender
     const sender = new PublicKey(accountField);
     // console.log(sender);
