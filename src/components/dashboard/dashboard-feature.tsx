@@ -54,9 +54,6 @@ export default function DashboardFeature() {
       qrRef.current.innerHTML = ''
       qr.append(qrRef.current)
     }
-    console.log(reference.toBase58());
-    console.log(qr);
-    console.log(qrRef);
     setPaymentStatus("Pending....")
 
     console.log('\n5. Find the transaction');

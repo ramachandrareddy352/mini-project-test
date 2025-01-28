@@ -27,7 +27,7 @@ export type PostError = {
 };
 
 const PROGRAM_ID = new PublicKey("AAwQy1UeenPqH6poqtiR6sKePDgeF2YcnHmy2jSNYRL6");
-const DISCRIMINATOR = sha256.digest('global:increment').slice(0,8);
+const DISCRIMINATOR = sha256.digest('global:decrement').slice(0,8);
 const data = Buffer.from([...DISCRIMINATOR])
 const privateKeyString: string = process.env.PRIVATE_KEY!;
 const privateKey = JSON.parse(privateKeyString);
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
     const incrementIx = new TransactionInstruction({
       programId: PROGRAM_ID, // Your program's ID
       keys: [
-        { pubkey: new PublicKey("HHZyF9QPGtaBAniTTnjWJN8vsyXhe4qvSrFYKiwsK5PA"), isSigner: false, isWritable: true },
+        { pubkey: new PublicKey("4TeGWrrqMHW43r2QVYctp993pD6tAb4ZW4dxHJDNqmBR"), isSigner: false, isWritable: true },
         { pubkey: sender, isSigner: true, isWritable: true }, 
         { pubkey: reference, isSigner: false, isWritable: false },
       ],
