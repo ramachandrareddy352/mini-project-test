@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { createQR, encodeURL, findReference, FindReferenceError } from '@solana/pay';
+import { createQR, encodeURL, findReference, FindReferenceError, TransactionRequestURLFields } from '@solana/pay';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { ConfirmedSignatureInfo, Keypair, PublicKey, SolanaJSONRPCError, TransactionSignature } from '@solana/web3.js';
 import BigNumber from 'bignumber.js';
@@ -27,20 +27,29 @@ export default function DashboardFeature() {
 
     // console.log('3. 💰 Create a payment request link for native sol \n');
     // const url = encodeURL({ recipient: recipient, amount, reference, label, message, memo });
-    console.log('3. 💰 Create a payment request link for spl-token sol \n');
-    const url = encodeURL({
-      recipient:MERCHANT_WALLET,
-      amount,
-      splToken,
-      reference,
-      label,
-      message,
-      memo,
-  });
-  // this is for creating tranction and working through api's
-    const SOLANA_PAY_URL = `solana:https://mini-project-e3-s2.vercel.app//api/hello?reference=${reference}`
-    console.log(SOLANA_PAY_URL);
-    const qr = createQR(SOLANA_PAY_URL, 360, 'white', 'black');
+    // console.log('3. 💰 Create a payment request link for spl-token sol \n');
+  //   const url = encodeURL({
+  //     recipient:MERCHANT_WALLET,
+  //     amount,
+  //     splToken,
+  //     reference,
+  //     label,
+  //     message,
+  //     memo,
+  // });
+  const params = new URLSearchParams()
+  params.append("reference", reference.toString());
+  const apiUrl = `${location.protocol}//${
+    location.host
+  }/api/hello?${params.toString()}`
+  const urlFields: TransactionRequestURLFields = {
+    link: new URL(apiUrl),
+  }
+  const url = encodeURL(urlFields)
+  // orking through api's
+    // const SOLANA_PAY_URL = `solana:https://mini-project-e3-s2.vercel.app//api/hello`
+    console.log(url);
+    const qr = createQR(url, 360, 'white', 'black');
     if (qrRef.current) {
       qrRef.current.innerHTML = ''
       qr.append(qrRef.current)
